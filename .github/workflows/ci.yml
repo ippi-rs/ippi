@@ -114,11 +114,33 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
       
-      - name: Install cross
-        run: cargo install cross
+      - name: Add ARMv6 target
+        run: rustup target add arm-unknown-linux-gnueabihf
+      
+      - name: Install ARMv6 cross-compilation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gcc-arm-linux-gnueabihf \
+            g++-arm-linux-gnueabihf \
+            libc6-armhf-cross \
+            libc6-dev-armhf-cross
+      
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-armv6-${{ hashFiles('**/Cargo.lock') }}
       
       - name: Build for ARMv6
-        run: cross build --release --target arm-unknown-linux-gnueabihf
+        env:
+          CARGO_TARGET_ARM_UNKNOWN_LINUX_GNUEABIHF_LINKER: arm-linux-gnueabihf-gcc
+          CC_arm_unknown_linux_gnueabihf: arm-linux-gnueabihf-gcc
+          CXX_arm_unknown_linux_gnueabihf: arm-linux-gnueabihf-g++
+        run: cargo build --release --target arm-unknown-linux-gnueabihf --features frontend-embedded
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
