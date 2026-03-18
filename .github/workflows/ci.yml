@@ -56,9 +56,6 @@ jobs:
       - name: Add target
         run: rustup target add ${{ matrix.target }}
       
-      - name: Install cross
-        run: cargo install cross
-      
       - name: Cache cargo
         uses: actions/cache@v4
         with:
@@ -68,8 +65,34 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
       
-      - name: Build with cross
-        run: cross build --release --target ${{ matrix.target }}
+      - name: Install cross-compilation tools for ARM
+        if: matrix.target != 'x86_64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          if [[ "${{ matrix.target }}" == "aarch64-unknown-linux-gnu" ]]; then
+            sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-arm64-cross libc6-dev-arm64-cross
+          elif [[ "${{ matrix.target }}" == "armv7-unknown-linux-gnueabihf" ]]; then
+            sudo apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libc6-armhf-cross libc6-dev-armhf-cross
+          fi
+      
+      - name: Build
+        run: |
+          if [[ "${{ matrix.target }}" == "x86_64-unknown-linux-gnu" ]]; then
+            cargo build --release --target ${{ matrix.target }} --features frontend-embedded
+          else
+            if [[ "${{ matrix.target }}" == "aarch64-unknown-linux-gnu" ]]; then
+              export CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc
+              export CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++
+              export AR_aarch64_unknown_linux_gnu=aarch64-linux-gnu-ar
+              export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc
+            elif [[ "${{ matrix.target }}" == "armv7-unknown-linux-gnueabihf" ]]; then
+              export CC_armv7_unknown_linux_gnueabihf=arm-linux-gnueabihf-gcc
+              export CXX_armv7_unknown_linux_gnueabihf=arm-linux-gnueabihf-g++
+              export AR_armv7_unknown_linux_gnueabihf=arm-linux-gnueabihf-ar
+              export CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=arm-linux-gnueabihf-gcc
+            fi
+            cargo build --release --target ${{ matrix.target }} --features frontend-embedded
+          fi
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
