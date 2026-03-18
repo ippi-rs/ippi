@@ -1,24 +1,22 @@
 <script>
-  import { onMount } from 'svelte';
-  
-  let config = {
+  let config = $state({
     version: '0.1.0',
     web: { host: '0.0.0.0', port: 8080 },
     p2p: { enabled: false },
     webrtc: { enabled: false },
     cloud_init: { enabled: false }
-  };
+  });
   
-  let uptime = '0s';
-  let peers = 0;
-  let memory = '0 MB';
-  let logs = [
+  let uptime = $state('0s');
+  let peers = $state(0);
+  let memory = $state('0 MB');
+  let logs = $state([
     '[System] IPPI v0.1.0 starting...',
     '[Web] Server listening on 0.0.0.0:8080',
     '[API] Health endpoint available at /health'
-  ];
+  ]);
   
-  let startTime = Date.now();
+  let startTime = $state(Date.now());
   
   async function loadConfig() {
     try {
@@ -75,17 +73,23 @@
     alert('Settings panel coming soon!');
   }
   
-  onMount(() => {
+  $effect(() => {
     loadConfig();
     updateUptime();
     updatePeers();
     updateMemory();
     
-    setInterval(updateUptime, 1000);
-    setInterval(updatePeers, 5000);
-    setInterval(updateMemory, 3000);
+    const uptimeInterval = setInterval(updateUptime, 1000);
+    const peersInterval = setInterval(updatePeers, 5000);
+    const memoryInterval = setInterval(updateMemory, 3000);
     
     addLog('[System] Frontend initialized successfully');
+    
+    return () => {
+      clearInterval(uptimeInterval);
+      clearInterval(peersInterval);
+      clearInterval(memoryInterval);
+    };
   });
 </script>
 
@@ -185,7 +189,7 @@
   <footer class="footer">
     <p>IPPI &copy; 2025 | Lightweight P2P KVM-over-IP | Built with Rust & Svelte</p>
     <p>
-      <a href="https://github.com/yourusername/kvmdust" style="color: var(--primary); text-decoration: none;">
+      <a href="https://github.com/ippi-rs/ippi" style="color: var(--primary); text-decoration: none;">
         <i class="fab fa-github"></i> GitHub
       </a>
       &nbsp;|&nbsp;
