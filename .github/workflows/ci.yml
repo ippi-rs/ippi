@@ -57,14 +57,8 @@ jobs:
       - name: Add target
         run: rustup target add ${{ matrix.target }}
       
-      - name: Install cross-compilation tools
-        run: |
-          sudo apt-get update
-          if [[ "${{ matrix.target }}" == "aarch64-unknown-linux-gnu" ]]; then
-            sudo apt-get install -y gcc-aarch64-linux-gnu
-          elif [[ "${{ matrix.target }}" == "armv7-unknown-linux-gnueabihf" ]]; then
-            sudo apt-get install -y gcc-arm-linux-gnueabihf
-          fi
+      - name: Install cross
+        run: cargo install cross
       
       - name: Cache cargo
         uses: actions/cache@v4
@@ -75,8 +69,8 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
       
-      - name: Build
-        run: cargo build --release --target ${{ matrix.target }}
+      - name: Build with cross
+        run: cross build --release --target ${{ matrix.target }}
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -134,28 +128,3 @@ jobs:
           name: ippi-armv6
           path: target/arm-unknown-linux-gnueabihf/release/ippi
 
-  docker:
-    name: Docker
-    if: secrets.DOCKER_USERNAME != ''
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: |
-            ippi/ippi:latest
-            ippi/ippi:${{ github.sha }}
-          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6
