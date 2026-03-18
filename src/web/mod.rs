@@ -1,6 +1,5 @@
 use crate::{Config, Result};
 use axum::{
-    extract::State,
     http::StatusCode,
     response::{Html, IntoResponse, Json},
     routing::get,

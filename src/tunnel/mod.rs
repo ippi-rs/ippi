@@ -253,13 +253,13 @@ impl Default for TunnelConfig {
 #[cfg(feature = "tun")]
 mod tun_impl {
     use super::*;
-    use tun::{Configuration, Device};
+    use tun::Configuration;
     
     impl TunnelManager {
         pub async fn connect_tun_tunnel(&self, tunnel: &mut TunnelInfo) -> Result<()> {
             let mut config = Configuration::default();
             
-            config.name("ippi-tun")
+            config.tun_name("ippi-tun")
                 .address(tunnel.local_ip.to_string())
                 .mtu(tunnel.mtu)
                 .up();
@@ -269,7 +269,7 @@ mod tun_impl {
             }
             
             // Create TUN device
-            let device = tun::create(&config)
+            let _device = tun::create(&config)
                 .map_err(|e| Error::InvalidArgument(format!("Failed to create TUN device: {}", e)))?;
             
             // Store device handle (in real implementation)
@@ -292,7 +292,7 @@ mod tun_impl {
             Ok(())
         }
         
-        pub async fn receive_tun_packet(&self, tunnel: &mut TunnelInfo) -> Result<Vec<u8>> {
+        pub async fn receive_tun_packet(&self, _tunnel: &mut TunnelInfo) -> Result<Vec<u8>> {
             // In real implementation, read from TUN device
             // Simulated packet for now
             Ok(vec![0u8; 64])
