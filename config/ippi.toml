@@ -1,0 +1,33 @@
+[web]
+host = "0.0.0.0"
+port = 8080
+cors_origins = ["*"]
+
+[kvm]
+enabled = false
+device_path = "/dev/kvm"
+memory_mb = 1024
+
+[p2p]
+enabled = false
+bootstrap_nodes = [
+    "/dns4/bootstrap.ippi.rs/tcp/4001/p2p/12D3KooWIPiRq6hAeMJ9bwLp6z4Xvq7LbHX8c6v6X8k4nYtN9sFm",
+    "/dns4/bootstrap.ippi.rs/tcp/4001/p2p/12D3KooWQw8nRrE6R7R6R6R6R6R6R6R6R6R6R6R6R6R6R6R6R6",
+]
+listen_port = 0
+protocol_version = "/ippi/0.1.0"
+
+[webrtc]
+enabled = false
+stun_servers = [
+    "stun:stun.l.google.com:19302",
+    "stun:global.stun.twilio.com:3478",
+]
+video_bitrate = 2000
+audio_bitrate = 128
+
+[cloud_init]
+enabled = false
+data_source = "NoCloud"
+metadata_url = "http://169.254.169.254/latest/meta-data"
+userdata_url = "http://169.254.169.254/latest/user-data"
