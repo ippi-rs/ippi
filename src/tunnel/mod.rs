@@ -3,11 +3,6 @@ use std::net::IpAddr;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
-#[cfg(feature = "tun")]
-mod tun_impl;
-
-#[cfg(feature = "tun")]
-pub use tun_impl::*;
 
 #[derive(Debug, Clone)]
 pub struct TunnelManager {
@@ -86,7 +81,7 @@ impl TunnelManager {
         
         tunnels.push(tunnel);
         
-        tracing::info!("Created tunnel {} (ID: {}) type: {:?}", name, id, tunnel_type);
+        tracing::info!("Created tunnel {} (ID: {})", name, id);
         
         Ok(id)
     }
@@ -170,7 +165,7 @@ impl TunnelManager {
         
         #[cfg(feature = "tun")]
         {
-            let packet = self.receive_tun_packet(tunnel).await?;
+            let packet: Vec<u8> = self.receive_tun_packet(tunnel).await?;
             tunnel.bytes_received += packet.len() as u64;
             Ok(packet)
         }
@@ -207,7 +202,7 @@ impl TunnelManager {
         if tunnel.status == TunnelStatus::Connected {
             #[cfg(feature = "tun")]
             {
-                self.disconnect_tun_tunnel(&tunnel).await?;
+                self.disconnect_tun_tunnel(&mut tunnels[index]).await?;
             }
         }
         
@@ -261,12 +256,12 @@ mod tun_impl {
     use tun::{Configuration, Device};
     
     impl TunnelManager {
-        async fn connect_tun_tunnel(&self, tunnel: &mut TunnelInfo) -> Result<()> {
+        pub async fn connect_tun_tunnel(&self, tunnel: &mut TunnelInfo) -> Result<()> {
             let mut config = Configuration::default();
             
-            config.name("kvmdust-tun")
+            config.name("ippi-tun")
                 .address(tunnel.local_ip.to_string())
-                .mtu(tunnel.mtu as i32)
+                .mtu(tunnel.mtu)
                 .up();
             
             if let Some(remote_ip) = tunnel.remote_ip {
@@ -285,19 +280,19 @@ mod tun_impl {
             Ok(())
         }
         
-        async fn disconnect_tun_tunnel(&self, tunnel: &mut TunnelInfo) -> Result<()> {
+        pub async fn disconnect_tun_tunnel(&self, tunnel: &mut TunnelInfo) -> Result<()> {
             // In real implementation, close the TUN device
             tunnel.status = TunnelStatus::Disconnected;
             Ok(())
         }
         
-        async fn send_tun_packet(&self, tunnel: &mut TunnelInfo, packet: &[u8]) -> Result<()> {
+        pub async fn send_tun_packet(&self, tunnel: &mut TunnelInfo, packet: &[u8]) -> Result<()> {
             // In real implementation, write to TUN device
             tracing::debug!("Sending {} bytes through tunnel {}", packet.len(), tunnel.id);
             Ok(())
         }
         
-        async fn receive_tun_packet(&self, tunnel: &mut TunnelInfo) -> Result<Vec<u8>> {
+        pub async fn receive_tun_packet(&self, tunnel: &mut TunnelInfo) -> Result<Vec<u8>> {
             // In real implementation, read from TUN device
             // Simulated packet for now
             Ok(vec![0u8; 64])

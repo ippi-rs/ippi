@@ -32,7 +32,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             
             // Descubrir peers
             println!("   Descubriendo peers en la red...");
-            let peers = p2p_manager.discover_peers().await?;
+            let peers: Vec<_> = p2p_manager.discover_peers().await?;
             println!("   Encontrados {} peers", peers.len());
             
             for peer in peers {
@@ -154,7 +154,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Para usar las features completas, compila con:");
     println!("  cargo build --features \"p2p-full\"");
     println!("");
-    println("Features disponibles:");
+    println!("Features disponibles:");
     println!("  - libp2p: Networking P2P con Kademlia DHT");
     println!("  - snow: Protocolo Noise para cifrado");
     println!("  - tun: Tunnels TUN/TAP para red virtual");
