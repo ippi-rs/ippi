@@ -76,7 +76,7 @@ impl Default for Config {
                     "/ip4/104.131.131.82/tcp/4001/p2p/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ".to_string(),
                 ],
                 listen_port: 0,
-                protocol_version: "/kvmdust/0.1.0".to_string(),
+                protocol_version: "/ippi/0.1.0".to_string(),
             }),
             webrtc: Some(WebRtcConfig {
                 enabled: false,

@@ -1,6 +1,6 @@
 # Contributing to IPPI
 
-Thank you for your interest in contributing to KvmDust! This document provides guidelines and instructions for contributing to the project.
+Thank you for your interest in contributing to IPPI! This document provides guidelines and instructions for contributing to the project.
 
 ## 📋 Table of Contents
 
@@ -420,7 +420,7 @@ What should happen.
 What actually happens.
 
 ## Environment
-- KvmDust version:
+- IPPI version:
 - OS and version:
 - Hardware (Pi model):
 - Rust version:

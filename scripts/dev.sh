@@ -16,7 +16,7 @@ API_PORT=8081
 
 # Print header
 echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}    KvmDust Development Environment     ${NC}"
+echo -e "${BLUE}    IPPI Development Environment     ${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 
@@ -164,7 +164,7 @@ main() {
     # Trap Ctrl+C for cleanup
     trap cleanup INT TERM EXIT
     
-    echo -e "${BLUE}🚀 Starting KvmDust development environment${NC}"
+    echo -e "${BLUE}🚀 Starting IPPI development environment${NC}"
     echo ""
     
     # Setup environment

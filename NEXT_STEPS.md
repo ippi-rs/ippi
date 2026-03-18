@@ -1,7 +1,7 @@
 # Próximos Passos Imediatos - IPPI
 
 ## Status Atual
-✅ **Rebranding completo de KvmDust para IPPI**
+✅ **Rebranding completo de IPPI para IPPI**
 - Todos os arquivos de código atualizados
 - Protocolos P2P/DHT atualizados
 - Configuração e documentação atualizadas
@@ -56,7 +56,7 @@ docker-compose up
 
 2. **Documentação:** `ippi.rs/docs`
    - Configurar GitHub Pages ou similar
-   - Atualizar todos os links de `kvmdust.dev` para `ippi.rs`
+   - Atualizar todos os links de `ippi.rs` para `ippi.rs`
 
 3. **Comunicação:**
    - Atualizar Discord/chat links
@@ -64,8 +64,8 @@ docker-compose up
 
 ### 5. **Testar Protocolos**
 **Protocolos atualizados:**
-- P2P: `/ippi/0.1.0` (anterior: `/kvmdust/0.1.0`)
-- DHT: `/ippi-dht/1.0.0` (anterior: `/kvmdust-dht/1.0.0`)
+- P2P: `/ippi/0.1.0` (anterior: `/ippi/0.1.0`)
+- DHT: `/ippi-dht/1.0.0` (anterior: `/ippi-dht/1.0.0`)
 
 **Testes necessários:**
 1. Testar compatibilidade com versões antigas (se necessário)
@@ -93,7 +93,7 @@ docker-compose up
 ## Checklist de Verificação Final
 
 ### Código
-- [x] Todas as referências a `kvmdust` removidas
+- [x] Todas as referências a `ippi` removidas
 - [x] Protocolos atualizados para `/ippi/`
 - [x] Bootstrap nodes configurados para `bootstrap.ippi.rs`
 - [x] Constantes NAME e VERSION atualizadas

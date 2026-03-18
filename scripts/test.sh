@@ -16,7 +16,7 @@ CARGO_NEXTEST="cargo nextest run"
 
 # Print header
 echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}       KvmDust Test Suite Runner        ${NC}"
+echo -e "${BLUE}       IPPI Test Suite Runner        ${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 
