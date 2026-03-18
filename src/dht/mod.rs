@@ -163,8 +163,8 @@ impl DhtManager {
 
         // Calculate distance for each peer
         let mut peer_distances: Vec<(&String, u32)> = peers
-            .iter()
-            .map(|(peer_id, _)| {
+            .keys()
+            .map(|peer_id| {
                 let distance = self.calculate_key_peer_distance(key, peer_id);
                 (peer_id, distance)
             })
@@ -295,7 +295,7 @@ impl DhtManager {
         peer_id.hash(&mut peer_hasher);
         let peer_hash = peer_hasher.finish();
 
-        (key_hash ^ peer_hash % 1000) as u32
+        (key_hash ^ (peer_hash % 1000)) as u32
     }
 
     async fn calculate_average_distance(&self, peers: &HashMap<String, DhtPeer>) -> f32 {

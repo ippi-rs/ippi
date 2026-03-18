@@ -54,7 +54,7 @@ jobs:
         run: cargo test --features frontend-embedded
       
       - name: Clippy
-        run: cargo clippy --features frontend-embedded
+        run: cargo clippy --features frontend-embedded -- -D warnings
       
       - name: Format
         run: cargo fmt --all -- --check
