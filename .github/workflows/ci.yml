@@ -130,7 +130,6 @@ jobs:
   pi-zero:
     name: Raspberry Pi Zero
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       
