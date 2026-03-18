@@ -1,8 +1,5 @@
-use axum::{
-    extract::State,
-    response::Json,
-};
 use crate::web::AppState;
+use axum::{extract::State, response::Json};
 
 pub async fn get_config(State(state): State<AppState>) -> Json<serde_json::Value> {
     Json(serde_json::json!({

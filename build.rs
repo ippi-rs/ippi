@@ -9,36 +9,35 @@ fn generate_build_info() -> Result<(), Box<dyn std::error::Error>> {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Generate build information
     generate_build_info()?;
-    
+
     // Build frontend if feature is enabled
     if cfg!(feature = "frontend-embedded") {
         build_frontend()?;
     }
-    
+
     // Print rerun-if-changed directives
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=Cargo.toml");
     println!("cargo:rerun-if-changed=Cargo.lock");
-    
+
     // Watch frontend directory if feature enabled
     if cfg!(feature = "frontend-embedded") {
         println!("cargo:rerun-if-changed=frontend/");
     }
-    
+
     Ok(())
 }
 
-
 fn build_frontend() -> Result<(), Box<dyn std::error::Error>> {
     let frontend_dir = Path::new("frontend");
-    
+
     // Check if frontend directory exists
     if !frontend_dir.exists() {
         println!("cargo:warning=Frontend directory not found, creating placeholder");
         create_placeholder_frontend()?;
         return Ok(());
     }
-    
+
     // Check if package.json exists
     let package_json = frontend_dir.join("package.json");
     if !package_json.exists() {
@@ -46,50 +45,52 @@ fn build_frontend() -> Result<(), Box<dyn std::error::Error>> {
         create_placeholder_frontend()?;
         return Ok(());
     }
-    
+
     // Check if node_modules exists
     let node_modules = frontend_dir.join("node_modules");
     if !node_modules.exists() {
         println!("cargo:warning=node_modules not found, attempting to install dependencies");
-        
+
         // Try to install dependencies
         let status = Command::new("npm")
             .arg("install")
             .current_dir(frontend_dir)
             .status();
-            
+
         match status {
             Ok(status) if status.success() => {
                 println!("cargo:warning=Frontend dependencies installed successfully");
             }
             _ => {
-                println!("cargo:warning=Failed to install frontend dependencies, creating placeholder");
+                println!(
+                    "cargo:warning=Failed to install frontend dependencies, creating placeholder"
+                );
                 create_placeholder_frontend()?;
                 return Ok(());
             }
         }
     }
-    
+
     // Build frontend
     println!("cargo:warning=Building frontend...");
-    
+
     let status = Command::new("npm")
         .arg("run")
         .arg("build")
         .current_dir(frontend_dir)
         .status();
-    
+
     match status {
         Ok(status) if status.success() => {
             println!("cargo:warning=Frontend built successfully");
-            
+
             // Verify dist directory was created
             let dist_dir = Path::new("dist");
             if !dist_dir.exists() {
                 println!("cargo:warning=dist directory not created by build, creating placeholder");
                 create_placeholder_frontend()?;
             }
-            
+
             // Check for index.html
             let index_html = dist_dir.join("index.html");
             if !index_html.exists() {
@@ -98,7 +99,10 @@ fn build_frontend() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Ok(status) => {
-            println!("cargo:warning=Frontend build failed with exit code: {:?}", status.code());
+            println!(
+                "cargo:warning=Frontend build failed with exit code: {:?}",
+                status.code()
+            );
             create_placeholder_frontend()?;
         }
         Err(e) => {
@@ -106,18 +110,18 @@ fn build_frontend() -> Result<(), Box<dyn std::error::Error>> {
             create_placeholder_frontend()?;
         }
     }
-    
+
     Ok(())
 }
 
 fn create_placeholder_frontend() -> Result<(), Box<dyn std::error::Error>> {
     let dist_dir = Path::new("dist");
-    
+
     // Create dist directory if it doesn't exist
     if !dist_dir.exists() {
         fs::create_dir_all(dist_dir)?;
     }
-    
+
     // Create minimal index.html
     let index_html = r#"<!DOCTYPE html>
 <html lang="en">
@@ -340,13 +344,13 @@ fn create_placeholder_frontend() -> Result<(), Box<dyn std::error::Error>> {
     </script>
 </body>
 </html>"#;
-    
+
     fs::write(dist_dir.join("index.html"), index_html)?;
-    
+
     // Create minimal CSS file
     let css_dir = dist_dir.join("assets");
     fs::create_dir_all(&css_dir)?;
-    
+
     let style_css = r#"/* Minimal styles for IPPI placeholder */
 body {
     margin: 0;
@@ -382,10 +386,10 @@ body {
     font-size: 2em;
     margin-bottom: 10px;
 }"#;
-    
+
     fs::write(css_dir.join("style.css"), style_css)?;
-    
+
     println!("cargo:warning=Created placeholder frontend in dist/");
-    
+
     Ok(())
 }

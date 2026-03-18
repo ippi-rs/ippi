@@ -26,14 +26,12 @@ pub async fn serve_static(_uri: axum::http::Uri) -> Response {
                 let mime = mime_guess::from_path(&path).first_or_octet_stream();
                 ([(header::CONTENT_TYPE, mime.as_ref())], content.data).into_response()
             }
-            None => {
-                match Asset::get("index.html") {
-                    Some(content) => {
-                        ([(header::CONTENT_TYPE, "text/html")], content.data).into_response()
-                    }
-                    None => (StatusCode::NOT_FOUND, "404 Not Found").into_response(),
+            None => match Asset::get("index.html") {
+                Some(content) => {
+                    ([(header::CONTENT_TYPE, "text/html")], content.data).into_response()
                 }
-            }
+                None => (StatusCode::NOT_FOUND, "404 Not Found").into_response(),
+            },
         }
     }
     #[cfg(not(feature = "frontend-embedded"))]

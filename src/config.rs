@@ -101,24 +101,24 @@ impl Default for Config {
 impl Config {
     pub async fn load<P: AsRef<Path>>(path: P) -> crate::Result<Self> {
         let path = path.as_ref();
-        
+
         if !path.exists() {
             tracing::warn!("Config file not found at {:?}, using defaults", path);
             return Ok(Self::default());
         }
-        
+
         let content = fs::read_to_string(path).await?;
         let config: Self = toml::from_str(&content)
             .map_err(|e| crate::Error::Config(format!("Failed to parse config: {}", e)))?;
-        
+
         Ok(config)
     }
-    
+
     pub async fn save<P: AsRef<Path>>(&self, path: P) -> crate::Result<()> {
         let path = path.as_ref();
         let content = toml::to_string_pretty(self)
             .map_err(|e| crate::Error::Config(format!("Failed to serialize config: {}", e)))?;
-        
+
         fs::write(path, content).await?;
         Ok(())
     }

@@ -7,7 +7,7 @@ license = "GPL-3.0-or-later"
 repository = "https://github.com/ippi-rs/ippi"
 readme = "README.md"
 edition = "2024"
-rust-version = "1.94"
+rust-version = "1.91"
 
 [features]
 default = ["frontend-embedded"]

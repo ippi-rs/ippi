@@ -4,7 +4,7 @@ use ippi::utils;
 fn test_timestamp() {
     let ts1 = utils::timestamp();
     let ts2 = utils::timestamp();
-    
+
     assert!(ts2 >= ts1);
 }
 
@@ -12,7 +12,7 @@ fn test_timestamp() {
 fn test_timestamp_ms() {
     let ts1 = utils::timestamp_ms();
     let ts2 = utils::timestamp_ms();
-    
+
     assert!(ts2 >= ts1);
 }
 

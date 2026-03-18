@@ -28,14 +28,14 @@ pub fn format_duration(seconds: u64) -> String {
 
 pub fn human_bytes(bytes: u64) -> String {
     const UNITS: [&str; 6] = ["B", "KB", "MB", "GB", "TB", "PB"];
-    
+
     if bytes == 0 {
         return "0 B".to_string();
     }
-    
+
     let base = 1024_f64;
     let exponent = (bytes as f64).log(base).floor() as usize;
     let value = bytes as f64 / base.powi(exponent as i32);
-    
+
     format!("{:.2} {}", value, UNITS[exponent.min(UNITS.len() - 1)])
 }

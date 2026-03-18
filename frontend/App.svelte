@@ -131,7 +131,7 @@
         <h3>KVM Console</h3>
       </div>
       <p>Access virtual machine consoles remotely with low-latency video streaming.</p>
-      <button class="button" on:click={openConsole}>
+      <button class="button" onclick={openConsole}>
         <i class="fas fa-play"></i> Launch Console
       </button>
     </div>
@@ -168,7 +168,7 @@
         <h3>Configuration</h3>
       </div>
       <p>Manage system settings, network configuration, and service preferences.</p>
-      <button class="button button-secondary" on:click={openSettings}>
+      <button class="button button-secondary" onclick={openSettings}>
         <i class="fas fa-sliders-h"></i> Settings
       </button>
     </div>
@@ -350,11 +350,5 @@
     color: #94a3b8;
   }
   
-  body {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    color: #f8fafc;
-    min-height: 100vh;
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  }
+
 </style>

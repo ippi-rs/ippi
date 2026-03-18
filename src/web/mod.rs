@@ -1,9 +1,9 @@
 use crate::{Config, Result};
 use axum::{
+    Router,
     http::StatusCode,
     response::{Html, IntoResponse, Json},
     routing::get,
-    Router,
 };
 use std::sync::Arc;
 use tower_http::cors::CorsLayer;
@@ -20,9 +20,11 @@ pub async fn serve(config: Config) -> Result<()> {
     let app = create_app(config.clone()).await?;
     let addr = format!("{}:{}", config.web.host, config.web.port);
     tracing::info!("Starting web server on {}", addr);
-    let listener = tokio::net::TcpListener::bind(&addr).await
+    let listener = tokio::net::TcpListener::bind(&addr)
+        .await
         .map_err(|e| crate::Error::Web(format!("Failed to bind to {}: {}", addr, e)))?;
-    axum::serve(listener, app.into_make_service()).await
+    axum::serve(listener, app.into_make_service())
+        .await
         .map_err(|e| crate::Error::Web(format!("Failed to serve: {}", e)))?;
     Ok(())
 }
@@ -40,10 +42,12 @@ async fn create_app(config: Config) -> Result<Router> {
         CorsLayer::new().allow_origin(tower_http::cors::Any)
     } else {
         CorsLayer::new().allow_origin(
-            config.web.cors_origins
+            config
+                .web
+                .cors_origins
                 .iter()
                 .map(|s| s.parse().unwrap())
-                .collect::<Vec<_>>()
+                .collect::<Vec<_>>(),
         )
     };
     let cors = cors
@@ -66,17 +70,22 @@ async fn root() -> Html<&'static str> {
     }
     #[cfg(not(feature = "frontend-embedded"))]
     {
-        Html(r#"<!DOCTYPE html><html><body>
+        Html(
+            r#"<!DOCTYPE html><html><body>
         <h1>IPPI</h1>
         <p>Backend running - Frontend not embedded</p>
-        </body></html>"#)
+        </body></html>"#,
+        )
     }
 }
 
 async fn health() -> impl IntoResponse {
-    (StatusCode::OK, Json(serde_json::json!({
-        "status": "ok",
-        "version": crate::VERSION,
-        "name": crate::NAME,
-    })))
+    (
+        StatusCode::OK,
+        Json(serde_json::json!({
+            "status": "ok",
+            "version": crate::VERSION,
+            "name": crate::NAME,
+        })),
+    )
 }
