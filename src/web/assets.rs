@@ -1,5 +1,7 @@
 use axum::{
-    http::{header, StatusCode},
+#[cfg(feature = "frontend-embedded")]
+    http::header,
+    http::StatusCode,
     response::{IntoResponse, Response},
 };
 
@@ -11,10 +13,10 @@ use rust_embed::RustEmbed;
 #[folder = "dist/"]
 struct Asset;
 
-pub async fn serve_static(uri: axum::http::Uri) -> Response {
+pub async fn serve_static(_uri: axum::http::Uri) -> Response {
     #[cfg(feature = "frontend-embedded")]
     {
-        let mut path = uri.path().trim_start_matches('/').to_string();
+        let mut path = _uri.path().trim_start_matches('/').to_string();
         if path.is_empty() {
             path = "index.html".to_string();
         }

@@ -1,7 +1,6 @@
 use std::fs;
 use std::path::Path;
 use std::process::Command;
-use vergen_gitcl::Emitter;
 
 fn generate_build_info() -> Result<(), Box<dyn std::error::Error>> {
     vergen_gitcl::Emitter::default().emit()?;

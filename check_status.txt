@@ -1,0 +1,14 @@
+Fixes aplicados:
+
+1. ✅ build.rs: Removido 'use vergen_gitcl::Emitter;' (línea 4)
+2. ✅ web/mod.rs: 'extract::State' ya estaba removido
+3. ✅ web/assets.rs: Arreglado parámetro uri (no _uri)
+4. ✅ tunnel/mod.rs: 
+   - 'use tun::{Configuration, Device};' → 'use tun::Configuration;' (línea 256)
+   - config.name("ippi-tun") → config.tun_name("ippi-tun") (línea 262)
+   - let device = tun::create → let _device = tun::create (línea 272)
+   - receive_tun_packet(&self, tunnel: &mut TunnelInfo) → (&self, _tunnel: &mut TunnelInfo) (línea 295)
+
+Estado: Todos los warnings principales han sido fixeados.
+
+Próximo paso: Ejecutar cargo check para verificar.
