@@ -1,9 +1,10 @@
 use axum::{
-#[cfg(feature = "frontend-embedded")]
-    http::header,
     http::StatusCode,
     response::{IntoResponse, Response},
 };
+
+#[cfg(feature = "frontend-embedded")]
+use axum::http::header;
 
 #[cfg(feature = "frontend-embedded")]
 use rust_embed::RustEmbed;

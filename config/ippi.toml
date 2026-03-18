@@ -18,6 +18,7 @@ listen_port = 0
 protocol_version = "/ippi/0.1.0"
 
 [webrtc]
+turn_servers = []
 enabled = false
 stun_servers = [
     "stun:stun.l.google.com:19302",

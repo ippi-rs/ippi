@@ -301,11 +301,11 @@ fn create_placeholder_frontend() -> Result<(), Box<dyn std::error::Error>> {
         document.addEventListener('DOMContentLoaded', function() {
             // Update status periodically
             function updateStatus() {
-                fetch('/api/health')
+                fetch('/health')
                     .then(response => response.json())
                     .then(data => {
                         const statusEl = document.querySelector('.status');
-                        if (data.status === 'healthy') {
+                        if (data.status === 'ok') {
                             statusEl.textContent = 'Backend Running ✓';
                             statusEl.style.background = 'rgba(76, 175, 80, 0.2)';
                             statusEl.style.borderColor = 'rgba(76, 175, 80, 0.5)';

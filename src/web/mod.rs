@@ -36,20 +36,23 @@ async fn create_app(config: Config) -> Result<Router> {
     let state = AppState {
         config: Arc::new(config.clone()),
     };
-    let cors = CorsLayer::new()
-        .allow_origin(
+    let cors = if config.web.cors_origins.iter().any(|s| s == "*") {
+        CorsLayer::new().allow_origin(tower_http::cors::Any)
+    } else {
+        CorsLayer::new().allow_origin(
             config.web.cors_origins
                 .iter()
                 .map(|s| s.parse().unwrap())
                 .collect::<Vec<_>>()
         )
+    };
+    let cors = cors
         .allow_methods(vec![axum::http::Method::GET, axum::http::Method::POST])
         .allow_headers(vec![axum::http::header::CONTENT_TYPE]);
 
     Ok(Router::new()
         .route("/", get(root))
         .route("/health", get(health))
-        .route("/api/config", get(api::config::get_config))
         .nest("/api", api::router())
         .fallback(axum::routing::get(assets::serve_static))
         .layer(cors)
