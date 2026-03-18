@@ -1,7 +1,6 @@
-use axum::body::Body;
+use axum::body::{Body, to_bytes};
 use axum::http::{Request, StatusCode};
 use ippi::{Config, web};
-use std::sync::Arc;
 use tower::ServiceExt;
 
 #[tokio::test]
@@ -21,7 +20,7 @@ async fn test_health_endpoint() {
 
     assert_eq!(response.status(), StatusCode::OK);
 
-    let body = hyper::body::to_bytes(response.into_body()).await.unwrap();
+    let body = to_bytes(response.into_body(), 1_000_000).await.unwrap();
     let json: serde_json::Value = serde_json::from_slice(&body).unwrap();
 
     assert_eq!(json["status"], "ok");
@@ -45,7 +44,7 @@ async fn test_config_endpoint() {
 
     assert_eq!(response.status(), StatusCode::OK);
 
-    let body = hyper::body::to_bytes(response.into_body()).await.unwrap();
+    let body = to_bytes(response.into_body(), 1_000_000).await.unwrap();
     let json: serde_json::Value = serde_json::from_slice(&body).unwrap();
 
     assert_eq!(json["web"]["host"], "0.0.0.0");
@@ -65,7 +64,7 @@ async fn test_root_endpoint() {
 
     assert_eq!(response.status(), StatusCode::OK);
 
-    let body = hyper::body::to_bytes(response.into_body()).await.unwrap();
+    let body = to_bytes(response.into_body(), 1_000_000).await.unwrap();
     let body_str = String::from_utf8_lossy(&body);
 
     assert!(body_str.contains("<!DOCTYPE html>"));
@@ -86,5 +85,9 @@ async fn test_not_found() {
         .await
         .unwrap();
 
-    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+    // SPA fallback serves index.html for unknown routes
+    assert_eq!(response.status(), StatusCode::OK);
+    let body = to_bytes(response.into_body(), 1_000_000).await.unwrap();
+    let body_str = String::from_utf8_lossy(&body);
+    assert!(body_str.contains("<!DOCTYPE html>"));
 }

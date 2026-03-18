@@ -29,7 +29,6 @@ pub async fn serve(config: Config) -> Result<()> {
     Ok(())
 }
 
-#[cfg(test)]
 pub async fn serve_test_app(config: Config) -> Result<Router> {
     Ok(create_app(config).await?)
 }

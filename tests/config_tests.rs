@@ -27,7 +27,8 @@ async fn test_config_default() {
 #[tokio::test]
 async fn test_config_load_missing() {
     let temp_file = NamedTempFile::new().unwrap();
-    let path = temp_file.path();
+    let path = temp_file.path().to_path_buf();
+    drop(temp_file); // File is deleted, path doesn't exist
 
     // File doesn't exist, should return defaults
     let config = Config::load(path).await.unwrap();
