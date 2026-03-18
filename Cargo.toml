@@ -83,6 +83,10 @@ vergen-gitcl = { version = "9", features = ["build", "cargo", "rustc"] }
 tokio = { version = "1.50", features = ["full", "rt-multi-thread"] }
 tempfile = "3.27"
 
+[[example]]
+name = "p2p_network"
+required-features = ["p2p", "tun"]
+
 [profile.dev]
 opt-level = 0
 debug = true
