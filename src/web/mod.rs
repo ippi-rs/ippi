@@ -8,12 +8,25 @@ use axum::{
 use std::sync::Arc;
 use tower_http::cors::CorsLayer;
 
+#[cfg(feature = "kvm")]
+use crate::kvm::KvmManager;
+#[cfg(feature = "p2p")]
+use crate::p2p::P2pManager;
+#[cfg(feature = "webrtc")]
+use crate::webrtc::WebRtcManager;
+
 pub mod api;
 pub mod assets;
 
 #[derive(Clone)]
 pub struct AppState {
     pub config: Arc<Config>,
+    #[cfg(feature = "kvm")]
+    pub kvm_manager: Option<Arc<KvmManager>>,
+    #[cfg(feature = "p2p")]
+    pub p2p_manager: Option<Arc<P2pManager>>,
+    #[cfg(feature = "webrtc")]
+    pub webrtc_manager: Option<Arc<WebRtcManager>>,
 }
 
 pub async fn serve(config: Config) -> Result<()> {
@@ -34,8 +47,79 @@ pub async fn serve_test_app(config: Config) -> Result<Router> {
 }
 
 async fn create_app(config: Config) -> Result<Router> {
+    let config_arc = Arc::new(config.clone());
+    
+    #[cfg(feature = "kvm")]
+    let kvm_manager = if config.kvm.as_ref().map(|k| k.enabled).unwrap_or(false) {
+        match KvmManager::new(config_arc.clone()) {
+            Ok(manager) => {
+                let manager = Arc::new(manager);
+                if let Err(e) = manager.initialize().await {
+                    tracing::warn!("Failed to initialize KVM manager: {}", e);
+                    None
+                } else {
+                    Some(manager)
+                }
+            }
+            Err(e) => {
+                tracing::warn!("Failed to create KVM manager: {}", e);
+                None
+            }
+        }
+    } else {
+        None
+    };
+
+    #[cfg(feature = "p2p")]
+    let p2p_manager = if config.p2p.as_ref().map(|p| p.enabled).unwrap_or(false) {
+        match P2pManager::new(config_arc.clone()) {
+            Ok(manager) => {
+                let manager = Arc::new(manager);
+                if let Err(e) = manager.initialize().await {
+                    tracing::warn!("Failed to initialize P2P manager: {}", e);
+                    None
+                } else {
+                    Some(manager)
+                }
+            }
+            Err(e) => {
+                tracing::warn!("Failed to create P2P manager: {}", e);
+                None
+            }
+        }
+    } else {
+        None
+    };
+
+    #[cfg(feature = "webrtc")]
+    let webrtc_manager = if config.webrtc.as_ref().map(|w| w.enabled).unwrap_or(false) {
+        match WebRtcManager::new(config_arc.clone()) {
+            Ok(manager) => {
+                let manager = Arc::new(manager);
+                if let Err(e) = manager.initialize().await {
+                    tracing::warn!("Failed to initialize WebRTC manager: {}", e);
+                    None
+                } else {
+                    Some(manager)
+                }
+            }
+            Err(e) => {
+                tracing::warn!("Failed to create WebRTC manager: {}", e);
+                None
+            }
+        }
+    } else {
+        None
+    };
+
     let state = AppState {
-        config: Arc::new(config.clone()),
+        config: config_arc,
+        #[cfg(feature = "kvm")]
+        kvm_manager,
+        #[cfg(feature = "p2p")]
+        p2p_manager,
+        #[cfg(feature = "webrtc")]
+        webrtc_manager,
     };
     let cors = if config.web.cors_origins.iter().any(|s| s == "*") {
         CorsLayer::new().allow_origin(tower_http::cors::Any)
