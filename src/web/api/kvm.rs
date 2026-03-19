@@ -10,10 +10,10 @@ use serde::Deserialize;
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/vms", get(list_vms).post(create_vm))
-        .route("/vms/:vm_id", get(get_vm).delete(delete_vm))
-        .route("/vms/:vm_id/start", post(start_vm))
-        .route("/vms/:vm_id/stop", post(stop_vm))
-        .route("/vms/:vm_id/disks", post(add_disk))
+        .route("/vms/{vm_id}", get(get_vm).delete(delete_vm))
+        .route("/vms/{vm_id}/start", post(start_vm))
+        .route("/vms/{vm_id}/stop", post(stop_vm))
+        .route("/vms/{vm_id}/disks", post(add_disk))
         .route("/stats", get(get_stats))
 }
 
@@ -85,8 +85,8 @@ async fn create_vm(
 }
 
 async fn get_vm(
-    State(_state): State<AppState>,
-    Path(_vm_id): Path<String>,
+    State(state): State<AppState>,
+    Path(vm_id): Path<String>,
 ) -> axum::Json<serde_json::Value> {
     #[cfg(feature = "kvm")]
     {
@@ -119,8 +119,8 @@ async fn get_vm(
 }
 
 async fn delete_vm(
-    State(_state): State<AppState>,
-    Path(_vm_id): Path<String>,
+    State(state): State<AppState>,
+    Path(vm_id): Path<String>,
 ) -> Json<serde_json::Value> {
     #[cfg(feature = "kvm")]
     {
@@ -147,8 +147,8 @@ async fn delete_vm(
 }
 
 async fn start_vm(
-    State(_state): State<AppState>,
-    Path(_vm_id): Path<String>,
+    State(state): State<AppState>,
+    Path(vm_id): Path<String>,
 ) -> Json<serde_json::Value> {
     #[cfg(feature = "kvm")]
     {
@@ -175,8 +175,8 @@ async fn start_vm(
 }
 
 async fn stop_vm(
-    State(_state): State<AppState>,
-    Path(_vm_id): Path<String>,
+    State(state): State<AppState>,
+    Path(vm_id): Path<String>,
 ) -> Json<serde_json::Value> {
     #[cfg(feature = "kvm")]
     {
@@ -210,9 +210,9 @@ struct AddDiskRequest {
 }
 
 async fn add_disk(
-    State(_state): State<AppState>,
-    Path(_vm_id): Path<String>,
-    Json(_payload): Json<AddDiskRequest>,
+    State(state): State<AppState>,
+    Path(vm_id): Path<String>,
+    Json(payload): Json<AddDiskRequest>,
 ) -> Json<serde_json::Value> {
     #[cfg(feature = "kvm")]
     {
@@ -240,7 +240,7 @@ async fn add_disk(
 }
 
 async fn get_stats(
-    State(_state): State<AppState>,
+    State(state): State<AppState>,
 ) -> Json<serde_json::Value> {
     #[cfg(feature = "kvm")]
     {

@@ -25,6 +25,8 @@ pub struct VmInstance {
     pub vcpus: u32,
     pub state: VmState,
     pub devices: Vec<VmDevice>,
+    #[cfg(feature = "kvm")]
+    pub handle: Option<vm::VmHandle>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -121,6 +123,9 @@ impl KvmManager {
 
         let id = uuid::Uuid::new_v4().to_string();
 
+        #[cfg(feature = "kvm")]
+        let handle = vm::VmHandle::new(memory_mb).ok();
+
         let vm = VmInstance {
             id: id.clone(),
             name: name.to_string(),
@@ -128,6 +133,8 @@ impl KvmManager {
             vcpus,
             state: VmState::Stopped,
             devices: Vec::new(),
+            #[cfg(feature = "kvm")]
+            handle,
         };
 
         state.vms.push(vm);
@@ -246,11 +253,10 @@ impl KvmManager {
 mod vm {
     use super::*;
     use kvm_ioctls::{Kvm, VmFd};
-    use std::fs::File;
-    use std::os::unix::io::AsRawFd;
 
+    #[derive(Debug, Clone)]
     pub struct VmHandle {
-        pub vm_fd: VmFd,
+        pub vm_fd: std::sync::Arc<VmFd>,
         pub memory_size: usize,
     }
 
@@ -258,9 +264,10 @@ mod vm {
         pub fn new(memory_mb: u64) -> Result<Self> {
             let kvm = Kvm::new().map_err(|e| Error::Kvm(format!("Failed to open KVM: {}", e)))?;
 
-            let vm_fd = kvm
-                .create_vm()
-                .map_err(|e| Error::Kvm(format!("Failed to create VM: {}", e)))?;
+            let vm_fd = std::sync::Arc::new(
+                kvm.create_vm()
+                    .map_err(|e| Error::Kvm(format!("Failed to create VM: {}", e)))?
+            );
 
             let memory_size = (memory_mb * 1024 * 1024) as usize;
 
