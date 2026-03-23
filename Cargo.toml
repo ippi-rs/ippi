@@ -11,8 +11,10 @@ rust-version = "1.91"
 
 [features]
 default = ["frontend-embedded", "p2p-full", "kvm"]
-frontend-embedded = ["rust-embed"]  # Frontend embebido en binario
+frontend-embedded = ["rust-embed"]  # Frontend embebido en binario (Svelte)
 frontend-external = []              # Frontend servido externamente
+leptos-wasm = ["leptos", "serde-wasm-bindgen"]  # Frontend Leptos WASM
+leptos-ssr = ["leptos", "leptos_axum", "serde-wasm-bindgen"]  # Leptos SSR con Axum
 
 # Para Pi Zero W (ARMv6)
 pi-zero = ["rppal", "rusb"]
@@ -54,6 +56,11 @@ mime_guess = "2.0"
 
 # Frontend embedding
 rust-embed = { version = "8.11", optional = true }
+
+# Leptos WASM frontend (optional)
+leptos = { version = "0.7", optional = true }
+leptos_axum = { version = "0.7", optional = true }
+serde-wasm-bindgen = { version = "0.6", optional = true }
 
 # P2P Networking (opcional)
 libp2p = { version = "0.56", optional = true, features = ["kad", "noise", "tcp", "dns", "websocket", "yamux", "ping"] }
@@ -114,5 +121,5 @@ debug = true
 strip = false
 
 [workspace]
-members = ["."]
+members = [".", "frontend-leptos"]
 resolver = "2"
